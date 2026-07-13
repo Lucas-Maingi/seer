@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Data & artifacts — never commit generated datasets or weights
+data/
+!data/.gitkeep
+weights/
+!weights/.gitkeep
+runs/
+*.onnx
+*.pt
+*.pth
+*.ckpt
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Node / Next.js
+web/node_modules/
+web/.next/
+web/out/
+web/.vercel
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env
+.env
+.env.*
+!.env.example
