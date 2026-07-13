@@ -1,0 +1,262 @@
+:root {
+  --bg: #0b0e14;
+  --panel: #131824;
+  --panel-2: #1a2130;
+  --border: #263043;
+  --text: #e6ebf4;
+  --muted: #8b96ab;
+  --accent: #4f8cff;
+  --pass: #2fbf71;
+  --review: #e8b93c;
+  --fail: #e05252;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+h1 {
+  font-size: 26px;
+  margin: 0;
+}
+
+.sub {
+  color: var(--muted);
+  margin: 6px 0 28px;
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.card h2 {
+  font-size: 15px;
+  margin: 0 0 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.drop {
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 0.15s;
+}
+
+.drop:hover {
+  border-color: var(--accent);
+}
+
+.drop img {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+select {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+.banner {
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 24px 0 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.banner.pass {
+  background: color-mix(in srgb, var(--pass) 16%, transparent);
+  color: var(--pass);
+  border: 1px solid var(--pass);
+}
+
+.banner.review {
+  background: color-mix(in srgb, var(--review) 14%, transparent);
+  color: var(--review);
+  border: 1px solid var(--review);
+}
+
+.banner.fail {
+  background: color-mix(in srgb, var(--fail) 14%, transparent);
+  color: var(--fail);
+  border: 1px solid var(--fail);
+}
+
+.reasons {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+td.mono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.confbar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  overflow: hidden;
+  min-width: 70px;
+}
+
+.confbar > div {
+  height: 100%;
+  background: var(--accent);
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.ok {
+  background: color-mix(in srgb, var(--pass) 18%, transparent);
+  color: var(--pass);
+}
+
+.badge.bad {
+  background: color-mix(in srgb, var(--fail) 18%, transparent);
+  color: var(--fail);
+}
+
+.gauge {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--panel-2);
+  margin: 10px 0 4px;
+}
+
+.gauge .fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+}
+
+.gauge .thr {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--text);
+}
+
+.latency {
+  display: flex;
+  height: 22px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.latency div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.error {
+  color: var(--fail);
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.footnote {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 26px;
+}
