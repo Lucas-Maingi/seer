@@ -124,12 +124,11 @@ def render_national_id(persona: Persona, portrait: Portrait,
     d.text((w // 2, 66), "REPUBLIC OF KENYA", font=f_head, fill=(20, 60, 30), anchor="mm")
     d.line([(40, 92), (w - 40, 92)], fill=(20, 60, 30), width=3)
 
-    serial_xy = (w - 320, 108)
-    d.text(serial_xy, f"SERIAL NUMBER: {persona.serial_number}", font=f_serial,
-           fill=(60, 30, 30))
+    d.text((w - 500, 108), "SERIAL NUMBER:", font=f_serial, fill=(60, 30, 30))
+    serial_xy = (w - 220, 108)
+    d.text(serial_xy, persona.serial_number, font=f_serial, fill=(60, 30, 30))
     gt.fields.append(FieldGT("serial_number", persona.serial_number,
-                             _text_quad(d, serial_xy, f"SERIAL NUMBER: {persona.serial_number}",
-                                        f_serial)))
+                             _text_quad(d, serial_xy, persona.serial_number, f_serial)))
 
     photo_box = (52, 160, 52 + 280, 160 + 350)
     _paste_portrait(img, portrait, photo_box, grayish=True)
