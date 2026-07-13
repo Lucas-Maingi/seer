@@ -10,15 +10,17 @@ comparison.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 
 import numpy as np
-import torch
 
 from seer.icao9303 import parse_td3
-from seer.ocr.crnn import CRNN, recognize
 from seer.ocr.fields import FIELD_ROIS, FieldRead, validate
+
+# recognizer backend: list of grayscale crops -> list of (text, confidence)
+RecognizeFn = Callable[[list[np.ndarray]], list[tuple[str, float]]]
 
 
 @dataclass
@@ -48,16 +50,23 @@ def _to_mrz_date(viz_date: str) -> str | None:
 
 
 class DocumentReader:
-    def __init__(self, model: CRNN, device: torch.device | str = "cpu"):
-        self.model = model.eval()
-        self.device = torch.device(device)
-        self.model.to(self.device)
+    """Backend-agnostic: pass any RecognizeFn (torch CRNN, ONNX session, ...)."""
+
+    def __init__(self, recognize_fn: RecognizeFn):
+        self.recognize_fn = recognize_fn
+
+    @classmethod
+    def from_torch(cls, model, device="cpu") -> "DocumentReader":
+        import torch
+        from seer.ocr.crnn import recognize
+        model = model.eval().to(torch.device(device))
+        return cls(lambda crops: recognize(model, crops, torch.device(device)))
 
     def read(self, canonical_gray: np.ndarray, kind: str) -> DocumentReadResult:
         rois = FIELD_ROIS[kind]
         names = list(rois)
         crops = [canonical_gray[y0:y1, x0:x1] for (x0, y0, x1, y1) in rois.values()]
-        recognized = recognize(self.model, crops, self.device)
+        recognized = self.recognize_fn(crops)
 
         fields: dict[str, FieldRead] = {}
         for name, (text, conf) in zip(names, recognized):
