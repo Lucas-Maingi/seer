@@ -94,10 +94,32 @@ python -m seer.runtime.bench    --report runs/latency.md
 uvicorn seer.api.main:app --reload
 ```
 
+## Training the real thing
+
+The smoke numbers in CI mean nothing — train on a real synthetic set:
+
+```bash
+python -m seer.synth.generate --out data/synth --count 20000 \
+    --faces path/to/synthetic_faces        # SFHQ or similar for realism
+python scripts/fetch_models.py             # YuNet + ArcFace (face stage)
+python -m seer.localize.train  --data data/synth --epochs 30
+python -m seer.ocr.train       --data data/synth --epochs 40
+python -m seer.forensics.train --data data/synth --epochs 25
+python -m seer.runtime.export --all
+python -m seer.runtime.quantize --all --calib data/synth
+python -m seer.runtime.bench
+```
+
+Then evaluate the sim-to-real gap on MIDV-2020 (localization) and LFW
+(face calibration via `python -m seer.face.calibrate`).
+
 ## Status
 
-Under active development. Each stage lands as an independent, reviewable
-commit — see the git history for the build narrative.
+All seven stages implemented and unit-tested (38 tests): synth engine,
+DSNT localization, CRNN OCR + MRZ, face verification, forensics, ONNX
+INT8 runtime, API, and web UI. Each stage landed as an independent,
+reviewable commit — the git history is the build narrative. Remaining:
+full-scale training runs and benchmark publication.
 
 ## License
 
