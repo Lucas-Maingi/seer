@@ -16,6 +16,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from seer.datautil import canonical_path
 from seer.ocr.charset import encode
 from seer.ocr.crnn import prepare_line
 
@@ -44,8 +45,7 @@ class FieldCropDataset(Dataset):
     def _canonical(self, sid: str) -> np.ndarray:
         if self._cache and self._cache[0] == sid:
             return self._cache[1]
-        img = cv2.imread(str(self.root / "canonical" / f"{sid}.png"),
-                         cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(str(canonical_path(self.root, sid)), cv2.IMREAD_GRAYSCALE)
         self._cache = (sid, img)
         return img
 

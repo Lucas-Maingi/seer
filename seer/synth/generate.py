@@ -6,7 +6,8 @@
 Emits, per sample i:
 
     scenes/{i:06d}.jpg      the "phone photo" (localization input)
-    canonical/{i:06d}.png   the fronto-parallel document (OCR/forensics input)
+    canonical/{i:06d}.jpg   the fronto-parallel document (OCR/forensics input;
+                            --canonical-format png for lossless)
     masks/{i:06d}.png       tamper mask in canonical coords (tampered only)
     labels/{i:06d}.json     all ground truth
     index.jsonl             one summary line per sample, with train/val split
@@ -40,7 +41,8 @@ def _split_of(sample_id: str, val_frac: float = 0.1) -> str:
 
 
 def generate(out: Path, count: int, faces_dir: str | None,
-             tamper_frac: float, passport_frac: float, seed: int) -> None:
+             tamper_frac: float, passport_frac: float, seed: int,
+             canonical_format: str = "jpg") -> None:
     rng = random.Random(seed)
     provider = make_provider(faces_dir)
     for sub in ("scenes", "canonical", "masks", "labels"):
@@ -70,7 +72,13 @@ def generate(out: Path, count: int, faces_dir: str | None,
             cv2.imwrite(str(out / "scenes" / f"{sid}.jpg"),
                         cv2.cvtColor(scene.image, cv2.COLOR_RGB2BGR),
                         [cv2.IMWRITE_JPEG_QUALITY, 92])
-            render.image.save(out / "canonical" / f"{sid}.png")
+            if canonical_format == "png":
+                render.image.save(out / "canonical" / f"{sid}.png")
+            else:
+                # q95: visually lossless for OCR, ~6x smaller than PNG, and
+                # matches reality — KYC uploads always carry a JPEG history
+                render.image.save(out / "canonical" / f"{sid}.jpg",
+                                  quality=95, subsampling=0)
 
             label = {
                 "id": sid,
@@ -110,10 +118,14 @@ def main() -> None:
     ap.add_argument("--tamper-frac", type=float, default=0.35)
     ap.add_argument("--passport-frac", type=float, default=0.4)
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--canonical-format", choices=["jpg", "png"], default="jpg",
+                    help="jpg q95 is ~6x smaller and matches real upload "
+                         "compression history; png for lossless")
     args = ap.parse_args()
     np.random.seed(args.seed)
     generate(args.out, args.count, args.faces,
-             args.tamper_frac, args.passport_frac, args.seed)
+             args.tamper_frac, args.passport_frac, args.seed,
+             canonical_format=args.canonical_format)
 
 
 if __name__ == "__main__":

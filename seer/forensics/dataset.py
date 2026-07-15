@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from seer.datautil import canonical_path
 from seer.forensics.model import INPUT_SIZE
 from seer.forensics.signals import forensic_stack
 
@@ -31,7 +32,7 @@ class TamperDataset(Dataset):
     def __getitem__(self, idx: int):
         meta = self.items[idx]
         sid = meta["id"]
-        bgr = cv2.imread(str(self.root / "canonical" / f"{sid}.png"))
+        bgr = cv2.imread(str(canonical_path(self.root, sid)))
         rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
         x = torch.from_numpy(forensic_stack(rgb, INPUT_SIZE))
 

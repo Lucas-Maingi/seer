@@ -48,7 +48,8 @@ class _SynthCalibrationReader:
             elif model == "tamper":
                 from seer.forensics.model import INPUT_SIZE as WH
                 from seer.forensics.signals import forensic_stack
-                img = cv2.cvtColor(cv2.imread(str(root / "canonical" / f"{sid}.png")),
+                from seer.datautil import canonical_path
+                img = cv2.cvtColor(cv2.imread(str(canonical_path(root, sid))),
                                    cv2.COLOR_BGR2RGB)
                 feeds.append({"input": forensic_stack(img, WH)[None]})
         return feeds
