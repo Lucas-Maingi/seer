@@ -1,0 +1,4 @@
+# shell scripts break on Linux with CRLF — force LF regardless of the
+# committer's platform settings
+*.sh text eol=lf
+*.ipynb text eol=lf
