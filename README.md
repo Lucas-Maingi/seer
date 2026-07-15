@@ -101,10 +101,10 @@ free cloud GPU, serve on a modest CPU.** The models are small (3M / 8M /
 <1M parameters), so a free Colab T4 or Kaggle session trains all three in
 an afternoon; the laptop only ever runs inference.
 
-- **Cloud (recommended):** open
-  [`notebooks/train_colab.ipynb`](notebooks/train_colab.ipynb) in Colab,
-  select a GPU runtime, run all cells, and download the ~tens-of-MB weights
-  zip back to the serving machine.
+- **Cloud (recommended):**
+  [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Lucas-Maingi/seer/blob/main/notebooks/train_colab.ipynb)
+  — select a GPU runtime, run all cells, and download the ~tens-of-MB
+  weights zip back to the serving machine.
 - **Anywhere:** `bash scripts/train_all.sh` reproduces the whole sequence
   (dataset → three training runs → ONNX export → INT8 quantization →
   latency report). Tune with `COUNT=8000 EPOCHS_CORNER=30 ...`.
