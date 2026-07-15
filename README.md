@@ -96,22 +96,31 @@ uvicorn seer.api.main:app --reload
 
 ## Training the real thing
 
-The smoke numbers in CI mean nothing — train on a real synthetic set:
+Training is split from serving by design: **generate anywhere, train on a
+free cloud GPU, serve on a modest CPU.** The models are small (3M / 8M /
+<1M parameters), so a free Colab T4 or Kaggle session trains all three in
+an afternoon; the laptop only ever runs inference.
+
+- **Cloud (recommended):** open
+  [`notebooks/train_colab.ipynb`](notebooks/train_colab.ipynb) in Colab,
+  select a GPU runtime, run all cells, and download the ~tens-of-MB weights
+  zip back to the serving machine.
+- **Anywhere:** `bash scripts/train_all.sh` reproduces the whole sequence
+  (dataset → three training runs → ONNX export → INT8 quantization →
+  latency report). Tune with `COUNT=8000 EPOCHS_CORNER=30 ...`.
+
+Back on the serving machine:
 
 ```bash
-python -m seer.synth.generate --out data/synth --count 20000 \
-    --faces path/to/synthetic_faces        # SFHQ or similar for realism
-python scripts/fetch_models.py             # YuNet + ArcFace (face stage)
-python -m seer.localize.train  --data data/synth --epochs 30
-python -m seer.ocr.train       --data data/synth --epochs 40
-python -m seer.forensics.train --data data/synth --epochs 25
-python -m seer.runtime.export --all
-python -m seer.runtime.quantize --all --calib data/synth
-python -m seer.runtime.bench
+unzip seer_weights.zip -d weights/
+python scripts/fetch_models.py     # YuNet + ArcFace for the face stage
+python -m seer.runtime.bench       # the latency that counts: serving CPU
+uvicorn seer.api.main:app          # + `npm run dev` in web/
 ```
 
 Then evaluate the sim-to-real gap on MIDV-2020 (localization) and LFW
-(face calibration via `python -m seer.face.calibrate`).
+(face calibration via `python -m seer.face.calibrate`). Canonical renders
+default to JPEG q95, keeping an 8k-sample dataset around 4 GB.
 
 ## Status
 
