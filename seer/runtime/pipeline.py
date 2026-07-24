@@ -46,9 +46,26 @@ def _session(path: Path):
     return ort.InferenceSession(str(path), opts, providers=["CPUExecutionProvider"])
 
 
+# Stages whose INT8 variant is rejected at serve time, based on measured
+# regressions on real CPU hardware (see runs/quantization_notes.md):
+#
+# - crnn:   the LSTM is dynamically quantized, which on CPUs without
+#           AVX512-VNNI (Skylake and most laptops) runs the int8 matmuls
+#           through a slow emulated path (~14x slower than fp32) and garbles
+#           batched output.
+# - corner: static quantization of the DSNT heatmap head collapses accuracy
+#           (measured mean corner error ~260px vs ~2px fp32) — the spatial
+#           softmax is too sensitive to activation quantization, and dead
+#           heatmaps decode to the image center.
+#
+# Only the tamper conv net quantizes cleanly (AUC 0.62 int8 vs 0.63 fp32),
+# so it keeps int8. This is a per-model precision decision, not a blanket one.
+_NO_INT8 = {"crnn", "corner"}
+
+
 def _pick(weights: Path, name: str, prefer_int8: bool) -> Path | None:
     int8, fp32 = weights / f"{name}.int8.onnx", weights / f"{name}.onnx"
-    if prefer_int8 and int8.exists():
+    if prefer_int8 and name not in _NO_INT8 and int8.exists():
         return int8
     return fp32 if fp32.exists() else (int8 if int8.exists() else None)
 
